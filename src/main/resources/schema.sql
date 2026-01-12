@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS subscriptions (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    amount NUMERIC(19, 4) NOT NULL,
+    frequency VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    next_run_date TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    version BIGINT DEFAULT 0
+    );
