@@ -1,6 +1,6 @@
 package com.bank.payments.subscription.service;
 
-import com.bank.payments.subscription.event.SubscriptionEvent;
+import com.bank.payments.events.SubscriptionEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;

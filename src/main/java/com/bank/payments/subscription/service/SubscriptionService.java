@@ -1,7 +1,8 @@
 package com.bank.payments.subscription.service;
 
+import com.bank.payments.events.SubscriptionEvent;
 import com.bank.payments.subscription.dto.SubscriptionRequest;
-import com.bank.payments.subscription.event.SubscriptionEvent;
+import com.bank.payments.subscription.mapper.SubscriptionMapper;
 import com.bank.payments.subscription.model.Subscription;
 import com.bank.payments.subscription.model.SubscriptionStatus;
 import com.bank.payments.subscription.repository.SubscriptionRepository;
@@ -15,6 +16,7 @@ public class SubscriptionService {
 
     private final SubscriptionRepository repository;
     private final SubscriptionProducer producer;
+    private final SubscriptionMapper mapper;
 
     @Transactional
     public Subscription createSubscription(SubscriptionRequest request) {
@@ -23,8 +25,7 @@ public class SubscriptionService {
         Subscription saved = repository.save(sub);
 
         // 2. Publish Event
-        SubscriptionEvent event = SubscriptionEvent.builder().subscriptionId(saved.getId()).userId(saved.getUserId()).amount(saved.getAmount()).frequency(saved.getFrequency().name()).type("CREATED").nextRunDate(saved.getNextRunDate()).build();
-
+        SubscriptionEvent event = mapper.toAvroEvent(saved);
         producer.sendEvent(event);
 
         return mapToResponse(saved);

@@ -1,0 +1,22 @@
+{
+  "type": "record",
+  "name": "SubscriptionEvent",
+  "namespace": "com.bank.payments.events",
+  "fields": [
+    { "name": "subscriptionId", "type": "long" },
+    { "name": "userId", "type": "string" },
+    {
+      "name": "amount",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 10,
+        "scale": 2
+      }
+    },
+    { "name": "frequency", "type": { "type": "enum", "name": "Frequency", "symbols": ["DAILY","HOURLY", "WEEKLY", "MONTHLY", "YEARLY"] } },
+    { "name": "nextRunDate", "type": { "type": "int", "logicalType": "date" } },
+    { "name": "type", "type": "string" },
+    { "name": "traceId", "type": ["null", "string"], "default": null }
+  ]
+}

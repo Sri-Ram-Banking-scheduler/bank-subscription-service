@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8080
 
 spring:
   application:
@@ -22,12 +22,16 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     producer:
+      # Use String for the Key
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      # Use Confluent Avro Serializer for the Value
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
       properties:
-        spring.json:
-          add.type.headers: true
-        spring.json.type.mapping: "subscriptionEvent:com.bank.payments.subscription.event.SubscriptionEvent"
+        # Essential for Avro: Where is the Schema Registry?
+        schema.registry.url: http://localhost:8089
+#        spring.json:
+#          add.type.headers: true
+#        spring.json.type.mapping: "subscriptionEvent:com.bank.payments.subscription.event.SubscriptionEvent"
 
 management:
   endpoints:
@@ -44,6 +48,9 @@ management:
     tracing:
       # This is the modern OTLP HTTP port for Jaeger
       endpoint: http://localhost:4318/v1/traces
+    metrics:
+      export:
+        enabled: false
   opentelemetry:
     resource-attributes:
       service.name: bank-subscription-service
@@ -51,16 +58,19 @@ management:
 
 logging:
   pattern:
-    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+    # Adding a clear separator and making traceId stand out
+    level: "%5p [%X{traceId:-},%X{spanId:-}] %m%n"
   level:
-    io.micrometer.tracing: TRACE
-    io.opentelemetry: DEBUG
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    prefer-ip-address: true
+    root: INFO
+    # Your code: Keep this at DEBUG to see your logic
+    com.bank.payments.subscription: DEBUG
+    # Hibernate: Keep SQL visible but clean
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    # The Noise: Mute these unless you are debugging the connection itself
+    io.micrometer.tracing: INFO
+    io.opentelemetry: WARN
+    org.apache.kafka: WARN
+    io.confluent: WARN
+    # Spring Web: Helpful for seeing incoming requests without the clutter
+    org.springframework.web: INFO
